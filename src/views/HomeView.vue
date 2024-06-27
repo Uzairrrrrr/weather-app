@@ -15,7 +15,10 @@
         <p class="py-2" v-if="searchError">
           Sorry, something went wrong, please try again.
         </p>
-        <p class="py-2" v-if="!searchError && mapboxSearchResults.length === 0">
+        <p
+          class="py-2"
+          v-if="!searchError && mapboxSearchResults.length === 0"
+        >
           No results match your query, try a different term.
         </p>
         <template v-else>
@@ -45,8 +48,8 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-// import CityCardSkeleton from "../components/CityCardSkeleton.vue";
-// import CityList from "../components/CityList.vue";
+import CityCardSkeleton from "../components/CityCardSkeleton.vue";
+import CityList from "../components/CityList.vue";
 
 const router = useRouter();
 const previewCity = (searchResult) => {
@@ -69,28 +72,19 @@ const queryTimeout = ref(null);
 const mapboxSearchResults = ref(null);
 const searchError = ref(null);
 
-// Cache to store the results of previous API requests
-const cache = ref({});
-
 const getSearchResults = () => {
   clearTimeout(queryTimeout.value);
   queryTimeout.value = setTimeout(async () => {
     if (searchQuery.value !== "") {
-      // Check if the search query exists in the cache
-      if (cache.value[searchQuery.value]) {
-        mapboxSearchResults.value = cache.value[searchQuery.value];
-        return;
-      }
       try {
         const result = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json?access_token=${mapboxAPIKey}&types=place`
         );
         mapboxSearchResults.value = result.data.features;
-        // Store the result in the cache
-        cache.value[searchQuery.value] = result.data.features;
       } catch {
         searchError.value = true;
       }
+
       return;
     }
     mapboxSearchResults.value = null;
